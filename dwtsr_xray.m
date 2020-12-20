@@ -22,9 +22,9 @@ level = {1, 2, 3, 4};
 n_iterations = length(intMethodStr)*length(waveletStr)*length(level);
 alpha = 2;
 
-% Lena Image Load (uint8)
-X = imread('lena_std.tif');
-img_original = rgb2gray(X);
+% Xray Image Load (uint8)
+X = imread('view1_frontal.jpg');
+img_original = X;
 
 % Data Holders
 rpsnr_down = zeros(1,n_iterations);
@@ -34,6 +34,7 @@ rssim_up = zeros(1,n_iterations);
 rniqe = zeros(1,n_iterations);
 caseStr = cell(1, n_iterations);
 iCount = 0;
+doPlots = false;
 l4plot = true;
 
 % Processing Loop
@@ -59,7 +60,9 @@ for ii=1:length(waveletStr)
                     img_rec1 = uint8(rescale(img_rec1,0,255));
                     
                     dispBands = [LL LH; HL HH];
-                    getDWTSRPlots(img_original, img_rec1, dispBands, waveletStr{ii}, level{jj}, intMethodStr{kk}, alpha);
+                    if doPlots 
+                        getDWTSRPlots(img_original, img_rec1, dispBands, waveletStr{ii}, level{jj}, intMethodStr{kk}, alpha);
+                    end
                     [rpsnr_down(iCount), rpsnr_up(iCount), rssim_down(iCount), rssim_up(iCount), rniqe(iCount)] = ...
                         getDWTSRStats(img_original, img_rec1, intMethodStr{kk}, alpha);
                 end % End interpolation method loop
@@ -94,7 +97,9 @@ for ii=1:length(waveletStr)
                     img_rec2 = uint8(rescale(img_rec2,0,255));
                     
                     dispBands = [LLLL LLLH; LLHL LLHH];
-                    getDWTSRPlots(img_original, img_rec2, dispBands, waveletStr{ii}, level{jj}, intMethodStr{kk}, alpha);
+                    if doPlots 
+                        getDWTSRPlots(img_original, img_rec2, dispBands, waveletStr{ii}, level{jj}, intMethodStr{kk}, alpha);
+                    end
                     [rpsnr_down(iCount), rpsnr_up(iCount), rssim_down(iCount), rssim_up(iCount), rniqe(iCount)] = ...
                         getDWTSRStats(img_original, img_rec2, intMethodStr{kk}, alpha);
                 end
@@ -140,7 +145,9 @@ for ii=1:length(waveletStr)
                     img_rec3 = uint8(rescale(img_rec3,0,255));
                     
                     dispBands = [LLLLLL LLLLLH; LLLLHL LLLLHH];
-                    getDWTSRPlots(img_original, img_rec3, dispBands, waveletStr{ii}, level{jj}, intMethodStr{kk}, alpha);
+                    if doPlots 
+                        getDWTSRPlots(img_original, img_rec3, dispBands, waveletStr{ii}, level{jj}, intMethodStr{kk}, alpha);
+                    end
                     [rpsnr_down(iCount), rpsnr_up(iCount), rssim_down(iCount), rssim_up(iCount), rniqe(iCount)] = ...
                         getDWTSRStats(img_original, img_rec3, intMethodStr{kk}, alpha);
                 end
@@ -197,23 +204,25 @@ for ii=1:length(waveletStr)
                     img_rec4 = uint8(rescale(img_rec4,0,255));
                     
                     dispBands = [LLLLLLLL LLLLLLLH; LLLLLLHL LLLLLLHH];
-                    getDWTSRPlots(img_original, img_rec4, dispBands, waveletStr{ii}, level{jj}, intMethodStr{kk}, alpha);
+                    if doPlots 
+                        getDWTSRPlots(img_original, img_rec4, dispBands, waveletStr{ii}, level{jj}, intMethodStr{kk}, alpha);
+                    end
                     [rpsnr_down(iCount), rpsnr_up(iCount), rssim_down(iCount), rssim_up(iCount), rniqe(iCount)] = ...
                         getDWTSRStats(img_original, img_rec4, intMethodStr{kk}, alpha);
                     
                     if l4plot
                         % plot unscaled output
-                        figure; subplot(2,3,1); imagesc(img_original); title('Original Image');
-                        subplot(2,3,2); imagesc(img_rec1);
+                        figure; subplot(2,3,1); imagesc(img_original); title('Original Image'); colormap(bone);
+                        subplot(2,3,2); imagesc(img_rec1); colormap(bone);
                         title(sprintf('%s Wavelet, %s Interpolation\nLevel 1 Reconstruction',...
                         waveletStr{ii}, intMethodStr{kk}));
-                        subplot(2,3,3); imagesc(img_rec2);
+                        subplot(2,3,3); imagesc(img_rec2); colormap(bone);
                         title(sprintf('%s Wavelet, %s Interpolation\nLevel 2 Reconstruction',...
                         waveletStr{ii}, intMethodStr{kk}));
-                        subplot(2,3,5); imagesc(img_rec3);
+                        subplot(2,3,5); imagesc(img_rec3); colormap(bone);
                         title(sprintf('%s Wavelet, %s Interpolation\nLevel 3 Reconstruction',...
                         waveletStr{ii}, intMethodStr{kk}));
-                        subplot(2,3,6); imagesc(img_rec4);
+                        subplot(2,3,6); imagesc(img_rec4); colormap(bone);
                         title(sprintf('%s Wavelet, %s Interpolation\nLevel 4 Reconstruction',...
                         waveletStr{ii}, intMethodStr{kk}));
                         fname = ['level1to4_' waveletStr{ii} '_' intMethodStr{kk} '.fig'];
@@ -225,17 +234,17 @@ for ii=1:length(waveletStr)
                         img_rec4d = imresize(img_rec4,1/alpha,intMethodStr{kk});
                         
                         % plot downsampled output with PSNR
-                        figure; subplot(2,3,1); imagesc(img_original); title('Original Image');
-                        subplot(2,3,2); imagesc(img_rec1d); 
+                        figure; subplot(2,3,1); imagesc(img_original); title('Original Image'); colormap(bone);
+                        subplot(2,3,2); imagesc(img_rec1d); colormap(bone);
                         title(sprintf('%s, %s Interpolation\nDownsampled Level 1 Reconstruction\nPSNR = %d',...
                         waveletStr{ii}, intMethodStr{kk}, psnr(img_original, img_rec1d)));
-                        subplot(2,3,3); imagesc(img_rec2d); 
+                        subplot(2,3,3); imagesc(img_rec2d); colormap(bone);
                         title(sprintf('%s, %s Interpolation\nDownsampled Level 2 Reconstruction\nPSNR = %d',...
                         waveletStr{ii}, intMethodStr{kk}, psnr(img_original, img_rec2d)));
-                        subplot(2,3,5); imagesc(img_rec3d); 
+                        subplot(2,3,5); imagesc(img_rec3d); colormap(bone);
                         title(sprintf('%s, %s Interpolation\nDownsampled Level 3 Reconstruction\nPSNR = %d',...
                         waveletStr{ii}, intMethodStr{kk}, psnr(img_original, img_rec3d)));
-                        subplot(2,3,6); imagesc(img_rec4d); 
+                        subplot(2,3,6); imagesc(img_rec4d); colormap(bone);
                         title(sprintf('%s, %s Interpolation\nDownsampled Level 4 Reconstruction\nPSNR = %d',...
                         waveletStr{ii}, intMethodStr{kk}, psnr(img_original, img_rec4d)));
                         
@@ -289,4 +298,4 @@ fname3 = 'niqe.fig';
 savefig(fullfile('out','stats',fname3));
 
 
-save(fullfile('out','stats','stats.mat'), 'rpsnr_down', 'rpsnr_up', 'rssim_down', 'rssim_up', 'rniqe');
+save(fullfile('out','stats','stats.mat'), 'rpsnr_down', 'rpsnr_up', 'rssim_down', 'rssim_up', 'rniqe','caseStr');
